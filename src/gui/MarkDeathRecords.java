@@ -1,0 +1,397 @@
+package gui;
+
+import db.DatabaseConnector;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MarkDeathRecords extends javax.swing.JPanel {
+
+    private Long selectedMemberId = null;
+
+    public MarkDeathRecords() {
+        initComponents();
+        loadDeceasedStatus();
+        loadSortOptions();
+
+        deceasedStatusComboBox.addActionListener(e -> refreshTable());
+        sortDeathDateComboBox.addActionListener(e -> refreshTable());
+        searchField.addActionListener(e -> refreshTable()); // when you press Enter
+
+        refreshTable();
+    }
+
+    private void loadDeceasedStatus() {
+        deceasedStatusComboBox.removeAllItems();
+        deceasedStatusComboBox.addItem("All");
+        deceasedStatusComboBox.addItem("Alive");
+        deceasedStatusComboBox.addItem("Dead");
+    }
+
+    private void loadSortOptions() {
+        sortDeathDateComboBox.removeAllItems();
+        sortDeathDateComboBox.addItem("None");
+        sortDeathDateComboBox.addItem("ASC");
+        sortDeathDateComboBox.addItem("DESC");
+    }
+
+    private void refreshTable() {
+        String searchText = searchField.getText().trim();
+        String deceasedStatus = (String) deceasedStatusComboBox.getSelectedItem();
+        String sortOrder = null;
+        if ("ASC".equals(sortDeathDateComboBox.getSelectedItem())) {
+            sortOrder = "ASC";
+        } else if ("DESC".equals(sortDeathDateComboBox.getSelectedItem())) {
+            sortOrder = "DESC";
+        }
+        loadAllMembers(searchText, deceasedStatus, sortOrder);
+    }
+
+    private void loadAllMembers(String searchText, String deceasedStatus, String sortOrder) {
+        List<Object> params = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT m.id, m.full_name, m.nic, m.mobile, m.email, "
+                + "a.line1, a.line2, d.name as district, p.name as province, "
+                + "pd.name as polling_div, ds.name as divisional_sec, "
+                + "m.reg_date, s.name as status, m.deceased_date "
+                + "FROM member m "
+                + "LEFT JOIN address a ON m.address_id = a.id "
+                + "LEFT JOIN divisional_secretariat ds ON a.divisional_secretariat_id = ds.id "
+                + "LEFT JOIN district d ON ds.district_id = d.id "
+                + "LEFT JOIN province p ON d.province_id = p.id "
+                + "LEFT JOIN polling_division pd ON a.polling_division_id = pd.id "
+                + "LEFT JOIN status s ON m.status_id = s.id "
+                + "WHERE 1=1 "
+        );
+
+        if (searchText != null && !searchText.isEmpty()) {
+            sql.append("AND (m.full_name LIKE ? OR m.nic LIKE ? OR CAST(m.id AS CHAR) LIKE ? OR m.mobile LIKE ?) ");
+            String like = "%" + searchText + "%";
+            params.add(like);
+            params.add(like);
+            params.add(like);
+            params.add(like);
+        }
+
+        if ("Alive".equals(deceasedStatus)) {
+            sql.append("AND m.deceased_date IS NULL ");
+        } else if ("Dead".equals(deceasedStatus)) {
+            sql.append("AND m.deceased_date IS NOT NULL ");
+        }
+
+        if ("ASC".equalsIgnoreCase(sortOrder)) {
+            sql.append("ORDER BY m.deceased_date ASC ");
+        } else if ("DESC".equalsIgnoreCase(sortOrder)) {
+            sql.append("ORDER BY m.deceased_date DESC ");
+        } else {
+            sql.append("ORDER BY m.id DESC ");
+        }
+
+        try (ResultSet rs = DatabaseConnector.executeQueryWithParams(sql.toString(), params.toArray())) {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getLong("id"),
+                    rs.getString("full_name"),
+                    rs.getString("nic"),
+                    rs.getString("mobile"),
+                    rs.getString("email"),
+                    rs.getString("line1"),
+                    rs.getString("line2"),
+                    rs.getString("district"),
+                    rs.getString("province"),
+                    rs.getString("polling_div"),
+                    rs.getString("divisional_sec"),
+                    rs.getDate("reg_date"),
+                    rs.getString("status"),
+                    rs.getDate("deceased_date")
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load members: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        searchField = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        deceasedStatusComboBox = new javax.swing.JComboBox<>();
+        clearAllButton = new javax.swing.JButton();
+        confirmPaymentButton = new javax.swing.JButton();
+        jLabel28 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tempCopyTextArea = new javax.swing.JTextArea();
+        jLabel23 = new javax.swing.JLabel();
+        deathDateChooser = new com.toedter.calendar.JDateChooser();
+        sortDeathDateComboBox = new javax.swing.JComboBox<>();
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Full Name", "NIC", "Mobile", "Email", "Adr Line1", "Adr Line2", "District", "Province", "Polling Div", "Div Sec", "Reg Date", "Status", "Death Date"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jTable1);
+
+        jLabel1.setBackground(new java.awt.Color(102, 102, 102));
+        jLabel1.setFont(new java.awt.Font("Palatino Linotype", 1, 36)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("View Life Records");
+
+        searchField.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
+        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                searchFieldKeyReleased(evt);
+            }
+        });
+
+        jLabel3.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Name / NIC / Member ID / Mobile");
+
+        jLabel8.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setText("Status");
+
+        deceasedStatusComboBox.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
+        deceasedStatusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        clearAllButton.setBackground(new java.awt.Color(204, 0, 0));
+        clearAllButton.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
+        clearAllButton.setForeground(new java.awt.Color(255, 255, 255));
+        clearAllButton.setText("Clear All");
+        clearAllButton.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        clearAllButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearAllButtonActionPerformed(evt);
+            }
+        });
+
+        confirmPaymentButton.setBackground(new java.awt.Color(0, 0, 51));
+        confirmPaymentButton.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
+        confirmPaymentButton.setForeground(new java.awt.Color(255, 255, 255));
+        confirmPaymentButton.setText("Mark As Dead");
+        confirmPaymentButton.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        confirmPaymentButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                confirmPaymentButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel28.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
+        jLabel28.setForeground(new java.awt.Color(255, 255, 0));
+        jLabel28.setText("Temp area to keep copied txt :");
+
+        tempCopyTextArea.setColumns(20);
+        tempCopyTextArea.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        tempCopyTextArea.setForeground(new java.awt.Color(255, 255, 0));
+        tempCopyTextArea.setLineWrap(true);
+        tempCopyTextArea.setRows(5);
+        tempCopyTextArea.setWrapStyleWord(true);
+        tempCopyTextArea.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jScrollPane2.setViewportView(tempCopyTextArea);
+
+        jLabel23.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel23.setText("Date");
+
+        deathDateChooser.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
+        deathDateChooser.setPreferredSize(new java.awt.Dimension(88, 28));
+
+        sortDeathDateComboBox.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
+        sortDeathDateComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(593, 593, 593))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(searchField))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel28)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(sortDeathDateComboBox, 0, 257, Short.MAX_VALUE))
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(12, 12, 12)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(jLabel23)
+                                            .addComponent(jLabel8))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(deceasedStatusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(deathDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(confirmPaymentButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addContainerGap())))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel8)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(deceasedStatusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel28)
+                                .addComponent(sortDeathDateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(deathDateChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel23))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(confirmPaymentButton))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(clearAllButton)
+                .addContainerGap())
+        );
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void clearAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllButtonActionPerformed
+        reset();
+    }//GEN-LAST:event_clearAllButtonActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        int row = jTable1.getSelectedRow();
+        if (row != -1) {
+            selectedMemberId = Long.parseLong(jTable1.getValueAt(row, 0).toString());
+            String nic = (String) jTable1.getValueAt(row, 2); // NIC column
+            searchField.setText(nic);
+
+            Object dateObj = jTable1.getValueAt(row, 13); // deceased_date column
+            if (dateObj instanceof java.sql.Date) {
+                deathDateChooser.setDate((java.sql.Date) dateObj);
+            } else if (dateObj != null) {
+                try {
+                    deathDateChooser.setDate(java.sql.Date.valueOf(dateObj.toString()));
+                } catch (Exception ex) {
+                    deathDateChooser.setDate(null);
+                }
+            } else {
+                deathDateChooser.setDate(null);
+            }
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void confirmPaymentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmPaymentButtonActionPerformed
+        if (selectedMemberId != null) {
+            java.util.Date selectedDate = deathDateChooser.getDate();
+            if (selectedDate == null) {
+                JOptionPane.showMessageDialog(this, "Please select a death date.");
+                return;
+            }
+            java.util.Date today = new java.util.Date();
+            if (selectedDate.after(today)) {
+                JOptionPane.showMessageDialog(this, "Death date cannot be in the future.");
+                return;
+            }
+            try {
+                java.sql.Date sqlDate = new java.sql.Date(selectedDate.getTime());
+                String sql = "UPDATE member SET deceased_date = ?, status_id = (SELECT id FROM status WHERE name='Deactivated') WHERE id = ?";
+                DatabaseConnector.executeUpdateWithParams(sql, sqlDate, selectedMemberId);
+
+                JOptionPane.showMessageDialog(this, "Updated successfully.");
+                refreshTable();
+                reset();
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed: " + e.getMessage());
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a member first.");
+        }
+    }//GEN-LAST:event_confirmPaymentButtonActionPerformed
+
+    private void searchFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchFieldKeyReleased
+        refreshTable();
+    }//GEN-LAST:event_searchFieldKeyReleased
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton clearAllButton;
+    private javax.swing.JButton confirmPaymentButton;
+    private com.toedter.calendar.JDateChooser deathDateChooser;
+    private javax.swing.JComboBox<String> deceasedStatusComboBox;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField searchField;
+    private javax.swing.JComboBox<String> sortDeathDateComboBox;
+    private javax.swing.JTextArea tempCopyTextArea;
+    // End of variables declaration//GEN-END:variables
+
+    private void reset() {
+        searchField.setText("");
+        tempCopyTextArea.setText("");
+        deceasedStatusComboBox.setSelectedIndex(0);
+        jTable1.clearSelection();
+        deathDateChooser.setDate(null);
+        sortDeathDateComboBox.setSelectedIndex(0);
+    }
+}
