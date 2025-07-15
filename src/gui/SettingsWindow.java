@@ -30,7 +30,7 @@ public class SettingsWindow extends javax.swing.JPanel {
         addPollingDivisionButton = new javax.swing.JButton();
         markDeathRecordsButton = new javax.swing.JButton();
 
-        addDivisionalSecretariatButton.setBackground(new java.awt.Color(0, 153, 51));
+        addDivisionalSecretariatButton.setBackground(new java.awt.Color(204, 204, 0));
         addDivisionalSecretariatButton.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
         addDivisionalSecretariatButton.setForeground(new java.awt.Color(255, 255, 255));
         addDivisionalSecretariatButton.setText("Add Divisional Secretariat");
@@ -41,7 +41,7 @@ public class SettingsWindow extends javax.swing.JPanel {
             }
         });
 
-        addPollingDivisionButton.setBackground(new java.awt.Color(0, 153, 51));
+        addPollingDivisionButton.setBackground(new java.awt.Color(0, 204, 204));
         addPollingDivisionButton.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
         addPollingDivisionButton.setForeground(new java.awt.Color(255, 255, 255));
         addPollingDivisionButton.setText("Add Polling Division");
@@ -52,7 +52,7 @@ public class SettingsWindow extends javax.swing.JPanel {
             }
         });
 
-        markDeathRecordsButton.setBackground(new java.awt.Color(0, 153, 51));
+        markDeathRecordsButton.setBackground(new java.awt.Color(0, 204, 51));
         markDeathRecordsButton.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
         markDeathRecordsButton.setForeground(new java.awt.Color(255, 255, 255));
         markDeathRecordsButton.setText("Mark Death Records");
@@ -68,30 +68,23 @@ public class SettingsWindow extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(316, 316, 316)
-                .addComponent(markDeathRecordsButton, javax.swing.GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
-                .addGap(168, 168, 168))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(316, 316, 316)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(addDivisionalSecretariatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
-                        .addComponent(addPollingDivisionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addContainerGap(168, Short.MAX_VALUE)))
+                .addContainerGap(148, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(addDivisionalSecretariatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
+                    .addComponent(markDeathRecordsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(addPollingDivisionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(148, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(293, Short.MAX_VALUE)
-                .addComponent(markDeathRecordsButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(176, 176, 176))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(216, 216, 216)
-                    .addComponent(addPollingDivisionButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(addDivisionalSecretariatButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(216, Short.MAX_VALUE)))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(49, 49, 49)
+                .addComponent(addPollingDivisionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(addDivisionalSecretariatButton, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(markDeathRecordsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(58, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
